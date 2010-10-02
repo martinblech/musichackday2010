@@ -62,7 +62,7 @@ class PlayTrack:
     def GET(self, id):
       track = itunes.get_track(id)
       itunes.play(track)
-      web.header('Content-Type', 'text/plain'; charset='utf-8')
+      web.header('Content-Type', 'text/plain; charset=utf-8')
       return 'OK'
 
 
