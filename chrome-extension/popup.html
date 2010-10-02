@@ -1,0 +1,34 @@
+<style>
+body {
+  min-width:357px;
+  overflow-x:hidden;
+}
+
+img {
+  margin:5px;
+  border:2px solid black;
+  vertical-align:middle;
+  width:75px;
+  height:75px;
+}
+</style>
+
+<script>
+var req = new XMLHttpRequest();
+req.open(
+    "GET",
+    "http://localhost:8080/search?q=marc",
+    true);
+req.onload = showTracks;
+req.send(null);
+
+function showTracks() {
+  var tracks = req.responseXML.getElementsByTagName("track");
+  for (var i = 0, track; track = tracks[i]; i++) {
+    elem = document.createElement('div');
+    elem.innerHTML = track.childNodes[0].nodeValue
+    document.body.appendChild(elem);
+  }
+}
+</script>
+

@@ -1,0 +1,13 @@
+{
+  "name": "Barcelona Music Hack Day",
+  "version": "1.0",
+  "description": "Barcelona Music Hack Day",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "popup": "popup.html"
+  },
+  "permissions": [
+    "http://localhost/"
+  ]
+}
+
