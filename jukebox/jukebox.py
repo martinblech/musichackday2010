@@ -10,12 +10,17 @@ def _not_implemented(*args, **kwargs):
 class JukeboxException(Exception):pass
 
 class Jukebox(object):
-    def __init__(self, data_path):
+    def __init__(self, data_path, sync=False):
         if not os.path.exists(data_path):
             os.makedirs(data_path)
         index_path = os.path.join(data_path, 'index')
         self.track_index = self._get_index(index_path, 'tracks')
-        self._sync_track_index()
+        self.query_parser = whoosh.qparser.MultifieldParser(
+                ['artist', 'title', 'lyrics'],
+                fieldboosts=dict(artist=1, title=1, lyrics=1),
+                group=whoosh.qparser.default.OrGroup)
+        if sync:
+            self.sync_track_index()
 
     def _get_index(self, index_path, index_name):
         if not whoosh.index.exists_in(index_path, index_name):
@@ -23,7 +28,7 @@ class Jukebox(object):
             if not os.path.exists(index_path):
                 os.makedirs(index_path)
             schema = whoosh.fields.Schema(
-                    id = whoosh.fields.ID(stored=True),
+                    id = whoosh.fields.ID(stored=True, unique=True),
                     artist = whoosh.fields.TEXT(stored=True),
                     title = whoosh.fields.TEXT(stored=True),
                     lyrics = whoosh.fields.TEXT(stored=True),
@@ -33,8 +38,6 @@ class Jukebox(object):
         return whoosh.index.open_dir(index_path, index_name)
 
     def _get_index_track(self, id, searcher=None):
-        if searcher is None:
-            searcher = self.track_index.searcher()
         q = whoosh.query.Term('id', id)
         results = searcher.search(q)
         if len(results)==0:
@@ -43,21 +46,22 @@ class Jukebox(object):
             return results[0]
         raise JukeboxException('more than one track with id=%s' % id)
 
-    def _sync_track_index(self):
+    def sync_track_index(self):
         print 'synchronizing track index...'
         searcher = self.track_index.searcher()
         writer = self.track_index.writer()
         try:
             for track in self.tracks:
-                print "sync track '%s - %s'..." % (track.artist, track.title)
                 index_track = self._get_index_track(unicode(track.id), searcher)
                 if index_track is None:
-                    print "missing, indexing..."
+                    print "'%s - %s' missing, indexing..." % (track.artist,
+                            track.title)
                     writer.add_document(id=unicode(track.id),
                             artist=track.artist, title=track.title,
                             lyrics=track.lyrics)
                 elif index_track['lyrics'] != track.lyrics:
-                    print "lyrics have changed, updating..."
+                    print "'%s - %s' has changed, updating..." % (track.artist,
+                            track.title)
                     index_track['lyrics'] = track.lyrics
                     writer.update_document(**index_track)
         finally:
@@ -68,13 +72,26 @@ class Jukebox(object):
 
     def __del__(self):
         self.track_index.close()
-        object.__del__(self)
 
     get_track = _not_implemented
     get_tracks = _not_implemented
     tracks = property(get_tracks)
 
-    search = _not_implemented
+    native_search = _not_implemented
+
+    def _search(self, query, searcher, offset=0, limit=100):
+        q = self.query_parser.parse(query)
+        results = searcher.search(q, limit=limit)
+        return [(results.score(i), self.get_track(r['id']))
+                for (i, r) in enumerate(results)]
+
+    def search(self, query):
+        searcher = self.track_index.searcher()
+        try:
+            return self._search(query, searcher)
+        finally:
+            searcher.close()
+
 
 class Track:
     get_id = _not_implemented

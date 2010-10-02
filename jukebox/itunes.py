@@ -9,13 +9,13 @@ def _clean(v):
     return v
 
 class ITunes(Jukebox):
-    def __init__(self, data_path=None):
+    def __init__(self, data_path=None, **kwargs):
         self.itunes = app('iTunes')
         (self.library,) = self.itunes.library_playlists.get()
         if data_path is None:
             data_path = os.path.expanduser(
                 '~/Library/Application Support/PyJukebox/iTunes/')
-        Jukebox.__init__(self, data_path)
+        Jukebox.__init__(self, data_path, **kwargs)
 
     def __wrap_track(self, track):
         return ITunesTrack(track)
@@ -34,7 +34,7 @@ class ITunes(Jukebox):
 
     tracks = property(get_tracks)
 
-    def search(self, query):
+    def itunes_search(self, query):
         tracks = self.itunes.search(self.library, for_=query)
         return self.__wrap_tracks(tracks)
 
