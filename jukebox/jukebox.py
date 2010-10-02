@@ -17,7 +17,7 @@ class Jukebox(object):
         self.track_index = self._get_index(index_path, 'tracks')
         self.query_parser = whoosh.qparser.MultifieldParser(
                 ['artist', 'title', 'lyrics'],
-                fieldboosts=dict(artist=1, title=1, lyrics=1),
+                    fieldboosts=dict(artist=1, title=1, lyrics=1),
                 group=whoosh.qparser.default.OrGroup)
         if sync:
             self.sync_track_index()
@@ -79,16 +79,16 @@ class Jukebox(object):
 
     native_search = _not_implemented
 
-    def _search(self, query, searcher, offset=0, limit=100):
+    def _search(self, query, searcher, limit=100):
         q = self.query_parser.parse(query)
         results = searcher.search(q, limit=limit)
         return [(results.score(i), self.get_track(r['id']))
                 for (i, r) in enumerate(results)]
 
-    def search(self, query):
+    def search(self, query, limit=100):
         searcher = self.track_index.searcher()
         try:
-            return self._search(query, searcher)
+            return self._search(query, searcher, limit)
         finally:
             searcher.close()
 
