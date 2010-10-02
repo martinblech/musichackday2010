@@ -7,7 +7,10 @@ try:
 except ImportError:
     import json
 
-urls = ('/search', 'Search')
+urls = (
+	'/search', 'Search',
+        '/track/(\d+)/play', 'PlayTrack'
+       )
 
 itunes = jukebox.ITunes()
 app = web.application(urls, globals())
@@ -54,6 +57,14 @@ class Search:
     web.header('Content-Type', 'application/json; charset=utf-8')        
     return json.dumps(tracks)
     
+
+class PlayTrack:
+    def GET(self, id):
+      track = itunes.get_track(id)
+      itunes.play(track)
+      web.header('Content-Type', 'text/plain'; charset='utf-8')
+      return 'OK'
+
 
 def strip_tags(value):
   return re.sub(r'<[^>]*?>', '', value)
