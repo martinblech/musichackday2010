@@ -92,6 +92,8 @@ class Jukebox(object):
         finally:
             searcher.close()
 
+    play = _not_implemented
+
 
 class Track:
     get_id = _not_implemented
@@ -100,6 +102,10 @@ class Track:
     get_artist = _not_implemented
     set_artist = _not_implemented
     artist = property(get_artist, set_artist)
+
+    get_album = _not_implemented
+    set_album = _not_implemented
+    album = property(get_album, set_album)
 
     get_title = _not_implemented
     set_title = _not_implemented

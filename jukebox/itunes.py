@@ -38,6 +38,18 @@ class ITunes(Jukebox):
         tracks = self.itunes.search(self.library, for_=query)
         return self.__wrap_tracks(tracks)
 
+    def play(self, track=None):
+        if track is None:
+            self.itunes.play()
+        else:
+            self.itunes.play(track.itunes_track)
+
+    def stop(self):
+        self.itunes.stop()
+
+    def pause(self):
+        self.itunes.pause()
+
 class ITunesTrack(Track):
     def __init__(self, itunes_track):
         self.itunes_track = itunes_track
@@ -54,6 +66,14 @@ class ITunesTrack(Track):
         self.itunes_track.artist.set(artist)
 
     artist = property(get_artist, set_artist)
+
+    def get_album(self):
+        return _clean(self.itunes_track.album.get())
+
+    def set_album(self, album):
+        self.itunes_track.album.set(album)
+
+    album = property(get_album, set_album)
 
     def get_title(self):
         return _clean(self.itunes_track.name.get())
