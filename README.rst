@@ -8,5 +8,5 @@ the browser contents with song lyrics. Powered by musixmatch.com
 
 Team Members:
 
-- Martín Blech - mblech@bmat.com
 - Pau Capella - pcapella@bmat.com
+- Martín Blech - mblech@bmat.com
