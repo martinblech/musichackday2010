@@ -1,3 +1,4 @@
+import os
 from appscript import *
 from jukebox import Jukebox, Track
 
@@ -8,13 +9,24 @@ def _clean(v):
     return v
 
 class ITunes(Jukebox):
-    def __init__(self):
+    def __init__(self, data_path=None):
         self.itunes = app('iTunes')
         (self.library,) = self.itunes.library_playlists.get()
+        if data_path is None:
+            data_path = os.path.expanduser(
+                '~/Library/Application Support/PyJukebox/iTunes/')
+        Jukebox.__init__(self, data_path)
+
+    def __wrap_track(self, track):
+        return ITunesTrack(track)
 
     def __wrap_tracks(self, tracks):
         for track in tracks:
-            yield ITunesTrack(track)
+            yield self.__wrap_track(track)
+
+    def get_track(self, id):
+        track = self.library.file_tracks.ID(id)
+        return self.__wrap_track(track)
 
     def get_tracks(self):
         tracks = self.library.file_tracks.get()
@@ -29,6 +41,11 @@ class ITunes(Jukebox):
 class ITunesTrack(Track):
     def __init__(self, itunes_track):
         self.itunes_track = itunes_track
+
+    def get_id(self):
+        return self.itunes_track.id.get()
+    
+    id = property(get_id)
 
     def get_artist(self):
         return _clean(self.itunes_track.artist.get())

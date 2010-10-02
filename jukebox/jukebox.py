@@ -1,13 +1,85 @@
+import os
+import whoosh.index
+import whoosh.fields
+import whoosh.query
+import whoosh.qparser
+
 def _not_implemented(*args, **kwargs):
     raise Exception('not implemented')
 
-class Jukebox:
+class JukeboxException(Exception):pass
+
+class Jukebox(object):
+    def __init__(self, data_path):
+        if not os.path.exists(data_path):
+            os.makedirs(data_path)
+        index_path = os.path.join(data_path, 'index')
+        self.track_index = self._get_index(index_path, 'tracks')
+        self._sync_track_index()
+
+    def _get_index(self, index_path, index_name):
+        if not whoosh.index.exists_in(index_path, index_name):
+            print 'creating %s index at %s' % (index_name, index_path)
+            if not os.path.exists(index_path):
+                os.makedirs(index_path)
+            schema = whoosh.fields.Schema(
+                    id = whoosh.fields.ID(stored=True),
+                    artist = whoosh.fields.TEXT(stored=True),
+                    title = whoosh.fields.TEXT(stored=True),
+                    lyrics = whoosh.fields.TEXT(stored=True),
+                    )
+            index = whoosh.index.create_in(index_path, schema, index_name)
+            index.writer().commit()
+        return whoosh.index.open_dir(index_path, index_name)
+
+    def _get_index_track(self, id, searcher=None):
+        if searcher is None:
+            searcher = self.track_index.searcher()
+        q = whoosh.query.Term('id', id)
+        results = searcher.search(q)
+        if len(results)==0:
+            return None
+        if len(results)==1:
+            return results[0]
+        raise JukeboxException('more than one track with id=%s' % id)
+
+    def _sync_track_index(self):
+        print 'synchronizing track index...'
+        searcher = self.track_index.searcher()
+        writer = self.track_index.writer()
+        try:
+            for track in self.tracks:
+                print "sync track '%s - %s'..." % (track.artist, track.title)
+                index_track = self._get_index_track(unicode(track.id), searcher)
+                if index_track is None:
+                    print "missing, indexing..."
+                    writer.add_document(id=unicode(track.id),
+                            artist=track.artist, title=track.title,
+                            lyrics=track.lyrics)
+                elif index_track['lyrics'] != track.lyrics:
+                    print "lyrics have changed, updating..."
+                    index_track['lyrics'] = track.lyrics
+                    writer.update_document(**index_track)
+        finally:
+            searcher.close()
+        writer.commit()
+        self.track_index.optimize()
+        print 'indexing sync finished'
+
+    def __del__(self):
+        self.track_index.close()
+        object.__del__(self)
+
+    get_track = _not_implemented
     get_tracks = _not_implemented
     tracks = property(get_tracks)
 
     search = _not_implemented
 
 class Track:
+    get_id = _not_implemented
+    id = property(get_id)
+
     get_artist = _not_implemented
     set_artist = _not_implemented
     artist = property(get_artist, set_artist)
