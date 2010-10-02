@@ -1,7 +1,7 @@
 import web
 import re
-from xml.dom.minidom import Document
 import jukebox
+import simplejson
 
 urls = ('/search', 'Search')
 
@@ -16,21 +16,16 @@ class Search:
 
     if params.get('limit') and not params.get('limit').isdigit():
       raise web.webapi.badrequest()
-
-    doc = Document()
-    tracks = doc.createElement("tracks")
-    doc.appendChild(tracks)
-
+    
     q = strip_tags(params.get('q'))
     limit = params.get('limit', 10)
 
     results = itunes.search(q, limit=limit)
+    tracks = []
     for score, track in results:
-      track_elem = doc.createElement('track')
-      track_value = doc.createTextNode(track.title)
-      track_elem.appendChild(track_value)
-      tracks.appendChild(track_elem)
-    return doc.toxml()
+      tracks.append({'id': track.id, 'title':track.title})
+    web.header('Content-Type', 'application/json; charset=utf-8')        
+    return simplejson.dumps(tracks)
     
 
 def strip_tags(value):

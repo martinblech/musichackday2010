@@ -2,6 +2,12 @@
   "name": "Barcelona Music Hack Day",
   "version": "1.0",
   "description": "Barcelona Music Hack Day",
+  "content_scripts": [
+   {
+      "matches": ["http://jquery.com/*"],
+      "js": ["jquery-1.4.2.min.js"]
+   }
+  ],
   "browser_action": {
     "default_icon": "icon.png",
     "popup": "popup.html"
