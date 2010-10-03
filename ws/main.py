@@ -39,28 +39,28 @@ class Search:
         word = word.lower()
         if word in stopwords or len(word) <= 3:
           continue
-        for token in stemmer(word):
-            token = token.text
-            if token in stopwords or len(token) <= 3:
-              continue
-            if token not in words:
-              words[token] = 1
-            else:
-              words[token] = words[token] + 1
+        token = word
+        if token not in words:
+          words[token] = 1
+        else:
+          words[token] = words[token] + 1
     tags = [x for x, _ in sorted(words.items(),
-            cmp=lambda x, y: cmp(y[1], x[1]))][3:30]
+        cmp=lambda x, y: cmp(y[1], x[1]))][:25]
     q = ' '.join(tags)
-    limit = params.get('limit', 25)
+    limit = params.get('limit', 20)
 
     results = itunes.search(q, limit=limit)
     tracks = []
     for score, track in results:
-        tracks.append({
-            'id': track.id,
-            'title':track.title,
-            'artist':track.artist,
-            'album':track.album,
-            'lyrics':track.lyrics})
+        try:
+            tracks.append({
+                'id': track.id,
+                'title':track.title,
+                'artist':track.artist,
+                'album':track.album,
+                'lyrics':track.lyrics})
+        except:
+            print "missing track", track.itunes_track
     web.header('Content-Type', 'application/json; charset=utf-8')        
     json_result = json.dumps(dict(tags=tags, tracks=tracks))
     return json_result
