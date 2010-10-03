@@ -37,17 +37,19 @@ class Search:
     for match in word_finder.finditer(q):
         word = match.group(0)
         word = word.lower()
+        if word in stopwords or len(word) <= 3:
+          continue
         for token in stemmer(word):
             token = token.text
-            if token not in stopwords and len(token) > 3:
-                if token not in words:
-                    words[token] = 1
-                else:
-                    words[token] = words[token] + 1
+            if token in stopwords or len(token) <= 3:
+              continue
+            if token not in words:
+              words[token] = 1
+            else:
+              words[token] = words[token] + 1
     tags = [x for x, _ in sorted(words.items(),
             cmp=lambda x, y: cmp(y[1], x[1]))][3:30]
     q = ' '.join(tags)
-    print q
     limit = params.get('limit', 25)
 
     results = itunes.search(q, limit=limit)
@@ -61,7 +63,6 @@ class Search:
             'lyrics':track.lyrics})
     web.header('Content-Type', 'application/json; charset=utf-8')        
     json_result = json.dumps(dict(tags=tags, tracks=tracks))
-    print json_result
     return json_result
     
 
