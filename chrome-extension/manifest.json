@@ -1,19 +1,19 @@
 {
-  "name": "Barcelona Music Hack Day",
-  "version": "1.0",
-  "description": "Barcelona Music Hack Day",
+  "name": "Mappy",
+  "version": "0.6.1",
+  "description": "Finds addresses in the web page you're on and pops up a map window.",
+  "icons": { "128": "icon-64.png" },
+  "background_page": "background.html",
   "content_scripts": [
-   {
-      "matches": ["*://*/*"],
-      "js": ["jquery-1.4.2.min.js", "grabtext.js"]
-   }
+    { "matches": ["http://*/*"], "js": ["content_script.js"] }
   ],
-  "browser_action": {
-    "default_icon": "icon.png",
-    "popup": "popup.html"
-  },
   "permissions": [
+    "tabs",
     "http://*/*"
-  ]
+  ],
+  "page_action": {
+      "default_name": "Display Map",
+      "default_icon": "icon-19.png",
+      "default_popup": "popup.html"
+  }
 }
-
