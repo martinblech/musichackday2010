@@ -1,9 +1,22 @@
 <head>
 <style>
 body {
-  min-width:357px;
-  overflow-x:hidden;
-}    
+    font-family: "Gill Sans", sans-serif;
+    min-width: 500px;
+    overflow-x: hidden;
+}
+.tracklist {
+    font-size: 90%;
+}
+.tagcloud {
+    font-size: 80%;
+}
+a:hover {
+    background-color: yellow;
+}
+.nohover:hover {
+    background-color: white;
+}
 </style>
 <script src="jquery-1.4.2.min.js"></script>
 <script>
@@ -37,10 +50,10 @@ body {
 </head>
 <body>
     Tags:
-    <div id="tags"></div>
+    <div id="tags" class="tagcloud"></div>
     Tracks:
-    <div id="tracks"></div>
-    <a href="http://musixmatch.com/" target="_blank">
+    <div id="tracks" class="tracklist"></div>
+    <a href="http://musixmatch.com/" target="_blank", class="nohover">
         <img src="powered-by-mXm-transparent.png"></img>
     </a>
 </body>
