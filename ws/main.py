@@ -48,7 +48,7 @@ class Search:
             cmp=lambda x, y: cmp(y[1], x[1]))][3:30]
     q = ' '.join(tags)
     print q
-    limit = params.get('limit', 10)
+    limit = params.get('limit', 25)
 
     results = itunes.search(q, limit=limit)
     tracks = []
