@@ -4,13 +4,18 @@ body {
     font-family: "Gill Sans", sans-serif;
     min-width: 500px;
     overflow-x: hidden;
+    text-align: center;
 }
 .tracklist {
+    text-align: left;
     font-size: 90%;
 }
 .tagcloud {
     font-size: 80%;
     text-align: center;
+}
+.poweredby {
+    text-align: right;
 }
 a:hover {
     background-color: yellow;
@@ -50,11 +55,19 @@ a:hover {
 </script>
 </head>
 <body>
-    Tags:
-    <div id="tags" class="tagcloud"></div>
-    Tracks:
-    <div id="tracks" class="tracklist"></div>
-    <a href="http://musixmatch.com/" target="_blank", class="nohover">
-        <img src="powered-by-mXm-transparent.png"></img>
+    <a href="http://github.com/martinblech/musichackday2010">
+        <h2>
+            <img src="icon-19.png"></img>WebSoundtrack<img src="icon-19.png">
+            </img>
+        </h2>
     </a>
+    - Tags -
+    <div id="tags" class="tagcloud"></div>
+    - Tracks -
+    <div id="tracks" class="tracklist"></div>
+    <div class="poweredby">
+        <a href="http://musixmatch.com/" target="_blank" class="nohover">
+            <img src="powered-by-mXm-transparent.png"></img>
+        </a>
+    </div>
 </body>
