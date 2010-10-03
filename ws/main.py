@@ -44,26 +44,33 @@ class Search:
                     words[token] = 1
                 else:
                     words[token] = words[token] + 1
-    q = ' '.join(x for x, _ in sorted(words.items(), cmp=lambda x, y: cmp(y[1],
-        x[1]))[:30])
+    tags = [x for x, _ in sorted(words.items(),
+            cmp=lambda x, y: cmp(y[1], x[1]))][3:30]
+    q = ' '.join(tags)
     print q
     limit = params.get('limit', 10)
 
     results = itunes.search(q, limit=limit)
     tracks = []
     for score, track in results:
-        print score, track.id, track.artist, track.title
-        tracks.append({'id': track.id, 'title':track.title})
+        tracks.append({
+            'id': track.id,
+            'title':track.title,
+            'artist':track.artist,
+            'album':track.album,
+            'lyrics':track.lyrics})
     web.header('Content-Type', 'application/json; charset=utf-8')        
-    return json.dumps(tracks)
+    json_result = json.dumps(dict(tags=tags, tracks=tracks))
+    print json_result
+    return json_result
     
 
 class PlayTrack:
     def GET(self, id):
       track = itunes.get_track(id)
       itunes.play(track)
-      web.header('Content-Type', 'text/plain; charset=utf-8')
-      return 'OK'
+      web.header('Content-Type', 'text/html; charset=utf-8')
+      return '<body onload="window.close()"></body>'
 
 
 def strip_tags(value):
