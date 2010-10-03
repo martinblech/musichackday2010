@@ -35,6 +35,7 @@ a:hover {
         var tag;
         var track;
         var tags_text = "";
+        var lyrics;
         for(i=0; i < data.tags.length; i++) {
             tag = data.tags[i];
             tags_text += tag + " ";
@@ -47,7 +48,11 @@ a:hover {
             elem.href = "http://localhost:8080/track/" + track.id + "/play";
             elem.target = "_blank";
             elem.innerText = track.artist + ' - ' + track.album + ' - ' + track.title
-            elem.title = track.lyrics
+            lyrics = track.lyrics;
+            if (lyrics.length > 500) {
+                lyrics = lyrics.substring(0, 500) + "[...]";
+            }
+            elem.title = lyrics
             contents.appendChild(elem);
             contents.appendChild(document.createElement('br'));
         }
