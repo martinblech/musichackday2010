@@ -13,7 +13,7 @@ with the contents of the pages you are browsing.",
     "http://*/*"
   ],
   "page_action": {
-      "default_name": "Display Map",
+      "default_name": "Related Songs",
       "default_icon": "icon-19.png",
       "default_popup": "popup.html"
   }
